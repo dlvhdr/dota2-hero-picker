@@ -1,0 +1,32 @@
+{
+  "name": "dota2-hero-picker",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "pg": "6.x",
+    "axios": "^0.17.1",
+    "flow-bin": "^0.61.0",
+    "immutable": "^3.8.2",
+    "infobox-parser": "^2.2.1",
+    "jquery": "^3.2.1",
+    "jsdom": "^11.5.1",
+    "json": "^9.0.6",
+    "okhttp": "^1.1.0",
+    "parsoid": "^0.8.0",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-scripts": "1.0.17",
+    "shelljs": "^0.7.8",
+    "wikijs": "^4.5.0"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject",
+    "flow": "flow"
+  },
+  "devDependencies": {
+    "webpack": "^3.10.0"
+  }
+}
