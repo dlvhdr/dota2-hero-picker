@@ -1,14 +1,13 @@
 // @flow
 
-var shell = require('shelljs');
 const MWBot = require('mwbot');
 const parsoid = require('parsoid');
-const $ = require('jquery');
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 const { List } = require('immutable');
 const axios = require('axios');
 var fs = require('fs');
+var queries = require('../src/queries');
 
 let bot = new MWBot();
 bot.setGlobalRequestOptions({
@@ -19,7 +18,6 @@ bot.setGlobalRequestOptions({
     prop: 'revisions',
     rvprop: 'content',
     indexpageids: '',
-    // rvparse: ''
   },
 });
 bot.setApiUrl('http://dota2.gamepedia.com/api.php');
@@ -43,9 +41,8 @@ const scrapeHero = (heroName) => {
   return bot.read(heroName).then(response => {
     return getPageData(response).revisions[0]['*'];
   })
-  .then(res => parsoid.parse(res))//.then(res => console.log(res.out))
+  .then(res => parsoid.parse(res))
   .then(res => {
-      // console.log(res.out)
       const dom = new JSDOM(res.out);
       const elements = List.of(...dom.window.document.getElementsByTagName('a'));
       return elements.filter(elem =>
@@ -101,9 +98,9 @@ const downloadHeroImages = (hero) => {
           return axios.get(imageURL, { responseType: 'arraybuffer' })
             .then(imageResponse => new Buffer(imageResponse.data), 'binary')
             .then(buffer => {
-              console.log('Saving file: ' + pageData.title);
+              console.log('Saving image: ' + pageData.title);
               fs.writeFile(
-                'heroes/' + pageData.title,
+                'public/images/' + pageData.title,
                 buffer
               );
             });
@@ -112,26 +109,21 @@ const downloadHeroImages = (hero) => {
     ));
 };
 
-fs.readFile('heroes/Abaddon.txt', 'utf8', (err, data) => {
-  let abaddon = JSON.parse(data);
-  downloadHeroImages(abaddon);
-});
-
 // getHeroList().then(
 //   heroList => {
-//     console.log('Handling ' + heroList.length + ' heroes\n');
+//     console.log('Handling ' + heroList.length + ' heroes');
 //     heroList.forEach(
 //       heroName => {
 //         scrapeHero(heroName)
 //           .then(hero => {
-//             fs.writeFile('heroes/' + heroName + ".txt", JSON.stringify(hero));
-//             console.log('handled: ' + heroName);
+//             saveHeroToDB(hero);
 //           })
 //       }
 //     );
 //   }
 // );
 
-scrapeHero('Abaddon').then(abaddon => {
-
+fs.readFile('heroes/Abaddon.txt', 'utf8', (err, data) => {
+  let abaddon = JSON.parse(data);
+  downloadHeroImages(abaddon);
 });
