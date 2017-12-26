@@ -7,7 +7,7 @@ const { JSDOM } = jsdom;
 const { List } = require('immutable');
 const axios = require('axios');
 var fs = require('fs');
-var queries = require('../src/queries');
+var db = require('../src/queries');
 
 let bot = new MWBot();
 bot.setGlobalRequestOptions({
@@ -38,6 +38,7 @@ const getPageData = (response) => {
 };
 
 const scrapeHero = (heroName) => {
+  console.log('Scraping: ' + heroName);
   return bot.read(heroName).then(response => {
     return getPageData(response).revisions[0]['*'];
   })
@@ -109,21 +110,22 @@ const downloadHeroImages = (hero) => {
     ));
 };
 
-// getHeroList().then(
-//   heroList => {
-//     console.log('Handling ' + heroList.length + ' heroes');
-//     heroList.forEach(
-//       heroName => {
-//         scrapeHero(heroName)
-//           .then(hero => {
-//             saveHeroToDB(hero);
-//           })
-//       }
-//     );
-//   }
-// );
+getHeroList().then(
+  heroList => {
+    console.log('Handling ' + heroList.length + ' heroes');
+    heroList.forEach(
+      heroName => {
+        scrapeHero(heroName)
+          .then(hero => {
+            db.insertHero(hero.info.title, hero);
+            downloadHeroImages(hero);
+          })
+      }
+    );
+  }
+);
 
-fs.readFile('heroes/Abaddon.txt', 'utf8', (err, data) => {
-  let abaddon = JSON.parse(data);
-  downloadHeroImages(abaddon);
-});
+// fs.readFile('heroes/Abaddon.txt', 'utf8', (err, data) => {
+//   let abaddon = JSON.parse(data);
+//   downloadHeroImages(abaddon);
+// });

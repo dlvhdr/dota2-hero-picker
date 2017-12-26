@@ -1,4 +1,5 @@
 node_modules/
 heroes/
+build/
 wow.html
 public/images
