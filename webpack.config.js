@@ -1,5 +1,0 @@
-// {
-//   externals: {
-//     "isomorphic-fetch": "fetch"
-//   }
-// }
