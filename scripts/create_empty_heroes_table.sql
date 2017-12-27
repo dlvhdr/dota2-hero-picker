@@ -8,6 +8,3 @@ CREATE TABLE heroes (
   hero_name varchar(100) UNIQUE,
   hero_json text
 );
-
-INSERT INTO heroes (hero_name, hero_json)
-  VALUES ('Dolev', '{ "ability1": "wowzah" }');
