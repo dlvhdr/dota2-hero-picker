@@ -8,6 +8,7 @@
     "express": "^4.16.2",
     "immutable": "^3.8.2",
     "jsdom": "^11.5.1",
+    "minimist": "^1.2.0",
     "mwbot": "^1.0.10",
     "parsoid": "^0.8.0",
     "pg": "6.x",

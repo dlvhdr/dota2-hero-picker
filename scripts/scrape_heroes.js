@@ -8,6 +8,7 @@ const { List } = require('immutable');
 const axios = require('axios');
 var fs = require('fs');
 var db = require('../src/queries');
+var argv = require('minimist')(process.argv.slice(2));
 
 let bot = new MWBot();
 bot.setGlobalRequestOptions({
@@ -110,20 +111,38 @@ const downloadHeroImages = (hero) => {
     ));
 };
 
-getHeroList().then(
-  heroList => {
-    console.log('Handling ' + heroList.length + ' heroes');
-    heroList.forEach(
-      heroName => {
-        scrapeHero(heroName)
-          .then(hero => {
-            db.insertHero(hero.info.title, hero);
-            downloadHeroImages(hero);
-          })
+const shouldDownloadImages = argv['images'];
+if (argv['all'] !== undefined) {
+  getHeroList().then(
+    heroList => {
+      console.log('Handling ' + heroList.length + ' heroes');
+      heroList.forEach(
+        heroName => {
+          scrapeHero(heroName)
+            .then(hero => {
+              db.insertHero(hero.info.title, hero);
+              if (shouldDownloadImages) {
+                downloadHeroImages(hero);
+              }
+            })
+        }
+      );
+    }
+  );
+} else if (argv['hero'] !== undefined) {
+  scrapeHero(argv['hero'])
+    .then(hero => {
+      db.insertHero(hero.info.title, hero);
+      if (shouldDownloadImages) {
+        downloadHeroImages(hero);
       }
-    );
-  }
-);
+    });
+} else {
+  console.log('Usage:\n' +
+  '--all to scrape ALL heroes\n' +
+  '--hero <hero_name (e.g. Abaddon)> to scrape just that hero\n' +
+  '--images to download the hero\'s images (icon + abilities)');
+}
 
 // fs.readFile('heroes/Abaddon.txt', 'utf8', (err, data) => {
 //   let abaddon = JSON.parse(data);
