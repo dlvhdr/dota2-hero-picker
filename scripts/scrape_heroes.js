@@ -9,6 +9,7 @@ const axios = require('axios');
 var fs = require('fs');
 var db = require('../src/queries');
 var argv = require('minimist')(process.argv.slice(2));
+const sharp = require('sharp');
 
 let bot = new MWBot();
 bot.setGlobalRequestOptions({
@@ -28,9 +29,14 @@ const getHeroList = () => {
       'http://www.dota2.com/jsfeed/heropickerdata',
       { responseType: 'json' }
   ).then(response => response.data)
-  .then(data =>
-    Object.entries(data).map(entry => entry[1].name.replace(' ', '_'))
-  );
+  .then(data => {
+    return Object.keys(data).map(key => ({
+      valveName: key,
+      naturalLanguageName: data[key].name.replace(/\ /g, '_'),
+      atk_type: data[key].atk,
+      roles: data[key].roles
+    }))
+  });
 };
 
 const getPageData = (response) => {
@@ -65,6 +71,7 @@ const scrapeHero = (heroName) => {
         ? hero.info = elem
         : hero.abilities.push(elem);
     });
+    console.log('Finished scraping ' + heroName);
     return hero;
   });
 };
@@ -111,37 +118,89 @@ const downloadHeroImages = (hero) => {
     ));
 };
 
-const shouldDownloadImages = argv['images'];
-if (argv['all'] !== undefined) {
+const downloadHeroVerticalImages = (valveName, naturalLanguageName = null) => {
+  const savedFilesHeroName = naturalLanguageName || valveName;
+  console.log(`Downloading vertical images: ${savedFilesHeroName}`);
+  return axios.get(
+    `http://cdn.dota2.com/apps/dota2/images/heroes/${valveName}_vert.jpg`,
+    { responseType: 'arraybuffer' }
+  )
+    .then(response => new Buffer(response.data, 'binary'))
+    .then(imageBuffer => {
+      let sharpImage = sharp(imageBuffer);
+      sharpImage.toFile(`images/${savedFilesHeroName}_vert.jpg`);
+      sharpImage.resize(98, 142)
+        .toFile(`images/${savedFilesHeroName}_vert_small.jpg`);
+    })
+    .catch(err => console.log(err));
+};
+
+const shouldDownloadAllImages = argv['all-images'];
+const shouldDownloadVerticalImages = shouldDownloadAllImages || argv['vertical-images'];
+if (argv['only-vertical-images'] !== undefined && argv['all'] !== undefined) {
+  console.log('Downloading all heroes vertical images');
+  getHeroList()
+    .then(heroList =>
+      heroList.forEach(heroObj => downloadHeroVerticalImages(
+        heroObj.valveName,
+        heroObj.naturalLanguageName
+      ))
+  );
+} else if (argv['all'] !== undefined) {
   getHeroList().then(
     heroList => {
       console.log('Handling ' + heroList.length + ' heroes');
       heroList.forEach(
-        heroName => {
-          scrapeHero(heroName)
-            .then(hero => {
-              db.insertHero(hero.info.title, hero);
-              if (shouldDownloadImages) {
-                downloadHeroImages(hero);
+        valveHeroObj => {
+          scrapeHero(valveHeroObj.naturalLanguageName)
+            .then(wikiHeroObj => {
+              db.insertHero(
+                wikiHeroObj.info.title,
+                wikiHeroObj.info['primary attribute'],
+                valveHeroObj.roles,
+                valveHeroObj.atk,
+                wikiHeroObj
+              );
+              if (shouldDownloadAllImages) {
+                downloadHeroImages(wikiHeroObj);
               }
             })
         }
       );
     }
   );
+} else if (argv['only-vertical-images'] !== undefined &&
+  argv['hero'] !== undefined) {
+  downloadHeroVerticalImages(argv['hero']);
 } else if (argv['hero'] !== undefined) {
-  scrapeHero(argv['hero'])
-    .then(hero => {
-      db.insertHero(hero.info.title, hero);
-      if (shouldDownloadImages) {
-        downloadHeroImages(hero);
+  getHeroList()
+    .then(heroList => heroList.filter(hero => hero.valveName === argv['hero'])[0])
+    .then(valveHeroObj => Promise.all([
+      Promise.resolve(valveHeroObj),
+      scrapeHero(valveHeroObj.naturalLanguageName)
+    ]))
+    .then(values => {
+      const valveHeroObj = values[0];
+      const wikiHeroObj = values[1];
+      db.insertHero(
+        wikiHeroObj.info.title,
+        wikiHeroObj.info['primary attribute'],
+        valveHeroObj.roles,
+        valveHeroObj.atk,
+        wikiHeroObj
+      );
+      if (shouldDownloadAllImages) {
+        downloadHeroImages(heroObj.wikiHero);
       }
-    });
+    })
+    .catch(console.log);
 } else {
   console.log('Usage:\n' +
   '--all to scrape ALL heroes\n' +
   '--hero <hero_name (e.g. Abaddon)> to scrape just that hero\n' +
-  '--images to download the hero\'s images (icon + abilities)');
+  '--all-images to download the hero\'s images: '
+    + 'horizontal icon, vertical icon, small vertical icon and abilities\n' +
+  '--only-vertical-images use valve name of the hero');
 }
 
 // fs.readFile('heroes/Abaddon.txt', 'utf8', (err, data) => {

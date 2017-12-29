@@ -10,27 +10,61 @@ const connectionString =
   process.env.DATABASE_URL || 'postgres://localhost:5432/dota2_hero_picker';
 var db = pgp(connectionString);
 
-const insertHero = (heroName, heroJSON) => {
+const insertHero = (heroName, primaryAttribute, roles, attackType, heroJSON) => {
+  console.log('Inserting ' + heroName + ' to DB');
+  // const formattedRoles = roles.map(role => '\'' + role + '\'').join(', ');
+  // console.log(formattedRoles);
   db.none(
-      'INSERT INTO heroes (hero_name, hero_json)' +
-      "VALUES (${heroName}, ${heroJSON}) " +
+      'INSERT INTO heroes (hero_name, main_attribute, roles, attack_type, hero_json)' +
+      "VALUES (${heroName}, ${primaryAttribute}, ${roles}, ${attackType}, ${heroJSON}) " +
       "ON CONFLICT (hero_name) DO UPDATE SET hero_json=excluded.hero_json",
-      {heroName, heroJSON}
+      {heroName, primaryAttribute, roles, attackType, heroJSON}
     )
     .then(data => ({
         status: 'success',
         data: data,
         message: 'Inserted ONE hero'
     }))
-    .catch(err => ({
-      status: 'failure',
-      data: err,
-      message: 'Failed to insert hero'
-    }));
+    .catch(err => {
+      console.log(err);
+      return {
+        status: 'failure',
+        data: err,
+        message: 'Failed to insert hero'
+      }
+    });
 };
 
 const getAllHeroes = () => {
   return db.any('SELECT * FROM heroes')
+    .then(data => ({
+      status: 'success',
+      data: data,
+      message: 'Retrieved ALL heroes'
+    }))
+    .catch(err => ({
+      status: 'failure',
+      data: err,
+      message: 'Could not retrieve heroes'
+    }));
+};
+
+const getAllHeroNames = () => {
+  return db.any('SELECT hero_name FROM heroes')
+    .then(data => ({
+      status: 'success',
+      data: data,
+      message: 'Retrieved ALL heroes'
+    }))
+    .catch(err => ({
+      status: 'failure',
+      data: err,
+      message: 'Could not retrieve heroes'
+    }));
+};
+
+const getAllHeroesBasicInfo = () => {
+  return db.any('SELECT hero_name, main_attribute, roles, attack_type FROM heroes')
     .then(data => ({
       status: 'success',
       data: data,
@@ -59,6 +93,8 @@ const getHero = (heroName) => {
 
 module.exports = {
   getAllHeroes: getAllHeroes,
+  getAllHeroNames: getAllHeroNames,
+  getAllHeroesBasicInfo: getAllHeroesBasicInfo,
   getHero: getHero,
   insertHero: insertHero
 };
