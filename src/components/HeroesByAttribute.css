@@ -1,0 +1,38 @@
+
+.HeroesByAttributeList {
+  margin-bottom: 30px;
+  display: table-row;
+}
+
+.AttributeName {
+  display: table-cell;
+  border-collapse: separate;
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  padding: 5px;
+  width: 1.5em;
+}
+
+.AttributeName .Rotate {
+  -webkit-transform: rotate(-90.0deg);
+  text-align: center;
+  white-space: nowrap;
+  margin-left: -20px;
+  margin-right: -20px;
+  border-bottom: 1px grey solid;
+  padding-bottom: 3px;
+  text-transform: uppercase;
+  font-size: 0.8em;
+}
+
+.HeroesList {
+  width: 100%;
+  display: table-cell;
+  word-wrap: break-word;
+}
+
+.HeroPreview {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}

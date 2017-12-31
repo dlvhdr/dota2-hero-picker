@@ -3,20 +3,15 @@ import { connect } from 'react-redux';
 import { setHeroName } from '../actions/actions';
 import { bindActionCreators } from 'redux';
 import path from 'path';
-import HeroPreview from './HeroPreview';
-import { getAllHeroNames } from '../queries';
+import HeroPicker from './HeroPicker';
 import './App.css';
 
 import Abaddon from '../../mock_data/Abaddon';
-import heroes from '../../mock_data/heroes';
 
 const App = ({ selectedHeroName, isFetching, setHeroName }) => {
-  console.log(getAllHeroNames);
   return (
     <div>
-      {heroes.map(heroName =>
-        <HeroPreview key={heroName.toLowerCase()} heroName={heroName} />
-      )}
+      <HeroPicker />
       <div>
         <p>Mock data:</p>
         <p>Hero: {Abaddon.info.title}
