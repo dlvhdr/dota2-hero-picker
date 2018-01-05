@@ -13,9 +13,16 @@ import registerServiceWorker from './registerServiceWorker';
 import thunk from 'redux-thunk';
 import reducers from './reducers/reducers';
 
+const logger = store => next => action => {
+  // console.log('Dispatching', action)
+  let result = next(action)
+  // console.log('Next state', store.getState())
+  return result
+}
+
 const store = createStore(
   reducers,
-  applyMiddleware(thunk)
+  applyMiddleware(thunk, logger)
 );
 
 ReactDOM.render(

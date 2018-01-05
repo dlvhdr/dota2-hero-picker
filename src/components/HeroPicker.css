@@ -1,5 +1,4 @@
 .HeroPicker {
-  display: table;
-  table-layout: fixed;
-  border-spacing: 0px 30px;
+  margin-left: 20px;
+  position: relative;
 }

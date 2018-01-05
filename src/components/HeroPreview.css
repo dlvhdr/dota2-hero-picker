@@ -1,0 +1,8 @@
+.HeroPreview.MatchingHero {
+  box-shadow: 0px 0px 5px 2px #1fecf5;
+}
+
+.NonMatchingHero {
+  -webkit-filter: grayscale(1);
+  filter: grayscale(1);
+}

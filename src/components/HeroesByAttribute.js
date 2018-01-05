@@ -9,11 +9,9 @@ const HeroesByAttribute = ({ attributeName, heroesList }) => {
   return (
     <div className='HeroesByAttributeList'>
       <div className='AttributeName'>
-        <div>
-          <div className='Rotate'>
-            {attributeName}
-          </div>
-        </div>
+        <span className='Rotate'>
+          {attributeName}
+        </span>
     </div>
       <div className='HeroesList'>
         {heroesList.map(hero =>
