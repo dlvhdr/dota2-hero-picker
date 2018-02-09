@@ -11,9 +11,7 @@ const connectionString =
 var db = pgp(connectionString);
 
 const insertHero = (heroName, primaryAttribute, roles, attackType, heroJSON) => {
-  console.log('Inserting ' + heroName + ' to DB');
-  // const formattedRoles = roles.map(role => '\'' + role + '\'').join(', ');
-  // console.log(formattedRoles);
+  console.log('Inserting ' + heroName + ' (' + heroJSON.info.title + ') to DB');
   db.none(
       'INSERT INTO heroes (hero_name, main_attribute, roles, attack_type, hero_json)' +
       "VALUES (${heroName}, ${primaryAttribute}, ${roles}, ${attackType}, ${heroJSON}) " +

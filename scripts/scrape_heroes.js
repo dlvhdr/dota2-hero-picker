@@ -11,6 +11,13 @@ var db = require('../src/queries');
 var argv = require('minimist')(process.argv.slice(2));
 const sharp = require('sharp');
 
+// type Hero = {
+//   valveName: string,
+//   naturalLanguageName: string,
+//   attackkType: string,
+//   roles: Array<string>
+// };
+
 let bot = new MWBot();
 bot.setGlobalRequestOptions({
   qs: {
@@ -32,7 +39,7 @@ const getHeroList = () => {
   .then(data => {
     return Object.keys(data).map(key => ({
       valveName: key,
-      naturalLanguageName: data[key].name.replace(/\ /g, '_'),
+      naturalLanguageName: data[key].name,
       atk_type: data[key].atk,
       roles: data[key].roles
     }))
@@ -44,9 +51,9 @@ const getPageData = (response) => {
   return response.query.pages[pageID];
 };
 
-const scrapeHero = (heroName) => {
-  console.log('Scraping: ' + heroName);
-  return bot.read(heroName).then(response => {
+const scrapeHero = (heroObj) => {
+  console.log('Scraping: ' + heroObj.naturalLanguageName);
+  return bot.read(heroObj.naturalLanguageName).then(response => {
     return getPageData(response).revisions[0]['*'];
   })
   .then(res => parsoid.parse(res))
@@ -71,7 +78,7 @@ const scrapeHero = (heroName) => {
         ? hero.info = elem
         : hero.abilities.push(elem);
     });
-    console.log('Finished scraping ' + heroName);
+    console.log('Finished scraping ' + heroObj.naturalLanguageName);
     return hero;
   });
 };
@@ -85,7 +92,6 @@ const mapWikiImageToAxiosPromise = (imageName) => {
 }
 
 const getHeroImageURLs = (hero) => {
-  // console.log(hero.info);
   let images = [hero.info.image];
   images.push(...hero.abilities.map(
     ability => ability.image
@@ -135,15 +141,13 @@ const downloadHeroVerticalImages = (valveName, naturalLanguageName = null) => {
     .catch(err => console.log(err));
 };
 
-const shouldDownloadAllImages = argv['all-images'];
-const shouldDownloadVerticalImages = shouldDownloadAllImages || argv['vertical-images'];
+const shouldDownloadAllImages = false;
 if (argv['only-vertical-images'] !== undefined && argv['all'] !== undefined) {
   console.log('Downloading all heroes vertical images');
   getHeroList()
     .then(heroList =>
       heroList.forEach(heroObj => downloadHeroVerticalImages(
-        heroObj.valveName,
-        heroObj.naturalLanguageName
+        heroObj.valveName
       ))
   );
 } else if (argv['all'] !== undefined) {
@@ -152,10 +156,10 @@ if (argv['only-vertical-images'] !== undefined && argv['all'] !== undefined) {
       console.log('Handling ' + heroList.length + ' heroes');
       heroList.forEach(
         valveHeroObj => {
-          scrapeHero(valveHeroObj.naturalLanguageName)
+          scrapeHero(valveHeroObj)
             .then(wikiHeroObj => {
               db.insertHero(
-                wikiHeroObj.info.title,
+                valveHeroObj.valveName,
                 wikiHeroObj.info['primary attribute'],
                 valveHeroObj.roles,
                 valveHeroObj.atk,
@@ -177,20 +181,20 @@ if (argv['only-vertical-images'] !== undefined && argv['all'] !== undefined) {
     .then(heroList => heroList.filter(hero => hero.valveName === argv['hero'])[0])
     .then(valveHeroObj => Promise.all([
       Promise.resolve(valveHeroObj),
-      scrapeHero(valveHeroObj.naturalLanguageName)
+      scrapeHero(valveHeroObj)
     ]))
     .then(values => {
       const valveHeroObj = values[0];
       const wikiHeroObj = values[1];
       db.insertHero(
-        wikiHeroObj.info.title,
+        valveHeroObj.valveName,
         wikiHeroObj.info['primary attribute'],
         valveHeroObj.roles,
         valveHeroObj.atk,
         wikiHeroObj
       );
       if (shouldDownloadAllImages) {
-        downloadHeroImages(heroObj.wikiHero);
+        downloadHeroImages(wikiHeroObj);
       }
     })
     .catch(console.log);

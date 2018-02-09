@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { keyDownUpdateSearchTerm } from '../actions/actions';
+import { keyDownUpdateSearchTerm, fetchAllHeroes } from '../actions/actions';
 import { bindActionCreators } from 'redux';
 import path from 'path';
 import HeroPicker from './HeroPicker';
 import classNames from 'classnames';
+import SelectedHero from './SelectedHero';
 import './App.css';
 
 import Abaddon from '../../mock_data/Abaddon';
@@ -13,6 +14,10 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
+  }
+
+  componentWillMount() {
+    this.props.fetchAllHeroes();
   }
 
   componentDidMount() {
@@ -27,13 +32,25 @@ class App extends React.Component {
     if (e.key === ' ') {
       e.preventDefault();
     }
-    if (e.key.match(/^([a-zA-Z ]|Backspace|Escape)$/g)) {
+    if (e.key.match(/^([a-zA-Z ]|Backspace|Escape|Enter)$/g)) {
       this.props.keyDownUpdateSearchTerm(e.key.toUpperCase());
     }
   }
 
   render() {
-    const { currentSearchTerm, searchTimeout, keyDownUpdateSearchTerm } = this.props;
+    const {
+      currentSearchTerm,
+      searchTimeout,
+      keyDownUpdateSearchTerm,
+      isFetchingHeroes
+    } = this.props;
+
+    if (isFetchingHeroes) {
+      return <div className="App">
+        Fetching heroes...
+      </div>;
+    }
+
     return (
       <div className="App">
         <div className="Search">
@@ -46,7 +63,10 @@ class App extends React.Component {
                 </div>
               : null
           }
-          <HeroPicker />
+          <div className="HeroPickerAndSelectedHeroContainer">
+            <HeroPicker />
+            <SelectedHero />
+          </div>
         </div>
         <div className="Mock">
           <p>Mock data:</p>
@@ -82,15 +102,20 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => {
   const { currentSearchTerm, searchTimeout } = state.searchInfo;
+  const { isFetchingHeroes } = state;
 
   return {
     currentSearchTerm,
-    searchTimeout
+    searchTimeout,
+    isFetchingHeroes
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
-  return bindActionCreators({keyDownUpdateSearchTerm}, dispatch);
+  return bindActionCreators({
+    keyDownUpdateSearchTerm,
+    fetchAllHeroes
+  }, dispatch);
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

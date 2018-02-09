@@ -5,6 +5,16 @@ import HeroPreview from './HeroPreview';
 
 import './HeroesByAttribute.css';
 
+const compareHeroNames = (heroA, heroB) => {
+  if (heroA.info.title < heroB.info.title) {
+    return -1;
+  } else if (heroA.info.title > heroB.info.title) {
+    return 1;
+  }
+
+  return 0;
+}
+
 const HeroesByAttribute = ({ attributeName, heroesList }) => {
   return (
     <div className='HeroesByAttributeList'>
@@ -14,12 +24,14 @@ const HeroesByAttribute = ({ attributeName, heroesList }) => {
         </span>
     </div>
       <div className='HeroesList'>
-        {heroesList.map(hero =>
-          <HeroPreview
-            className='HeroPreview'
-            key={hero.heroName.toLowerCase()}
-            hero={hero} />
-        )}
+        {heroesList.sort(compareHeroNames)
+          .map(hero =>
+            <HeroPreview
+              className='HeroPreview'
+              key={hero.valveName}
+              hero={hero} />
+          )
+        }
       </div>
     </div>
   );

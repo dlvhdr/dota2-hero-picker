@@ -1,2 +1,5 @@
 node_modules/
 heroes/
+.DS_Store
+public/bundle.js
+public/images/

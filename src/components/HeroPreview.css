@@ -1,8 +1,111 @@
-.HeroPreview.MatchingHero {
+.HeroPreviewRoot .SmallContainer {
+  width: 42px;
+  height: 60px;
+}
+
+.HeroPreviewRoot .LargeContainer {
+
+}
+
+.HeroPreview {
+  position: relative;
+  display: inline-block;
+  margin-right: 10px;
+  margin-top: 10px;
+  box-shadow: 0px 0px 5px 0px black;
+}
+
+.HeroPreview .MatchingHero {
   box-shadow: 0px 0px 5px 2px #1fecf5;
+  z-index: 2;
 }
 
 .NonMatchingHero {
   -webkit-filter: grayscale(1);
   filter: grayscale(1);
+}
+
+.LargeContainer {
+  display: none;
+  pointer-events: none;
+  position: absolute;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+  top: -5px;
+  z-index: 2;
+  width: 92px;
+  height: 132px;
+  border: 1px black solid;
+  box-shadow: 0px 0px 5px 0px black;
+  animation: popout 0.05s linear 1;
+  animation-fill-mode: forwards;
+  margin-left: -47px;
+}
+
+.HoveredOverHero .LargeContainer {
+  display: inline-block;
+}
+
+.LargePicture {
+  position: absolute;
+  left: 50%;
+  right: 0;
+  bottom: 0;
+  top: -5px;
+  margin-left: -46px;
+  pointer-events: none;
+  z-index: 2;
+  display: block;
+  animation: photo-popout 0.05s linear 1;
+  animation-fill-mode: forwards;
+}
+
+.HeroName {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.6);
+  text-align: center;
+  font-size: 8px;
+  line-height: 10px;
+  font-family: Arial;
+  font-weight: bold;
+  vertical-align: text-bottom;
+  min-height: 8px;
+  padding: 3px;
+  z-index: 3;
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+}
+
+.HeroName div {
+  position: relative;
+  top: 0.5px;
+}
+
+@keyframes popout {
+  0% {
+    width: 42px;
+    height: 60px;
+    margin-left: -21px;
+  }
+  100% {
+    width: 94.5px;
+    height: 133.5px;
+    margin-left: -47px;
+  }
+}
+
+@keyframes photo-popout {
+  0% {
+    width: 42px;
+    height: 60px;
+  }
+  100% {
+    width: 94.5px;
+    height: 133.5px;
+  }
 }

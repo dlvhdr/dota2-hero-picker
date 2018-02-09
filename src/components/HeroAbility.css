@@ -1,0 +1,32 @@
+.HeroAbilityRoot {
+  color: #9AA8BE;
+  font-family: Arial;
+  line-height: 20px;
+}
+
+.HeroAbilityTraits {
+  margin-top: 10px;
+}
+
+.AbiltyTrait {
+  font-size: 15px;
+}
+
+.AbiltyTrait .TraitName {
+  text-transform: uppercase;
+  color: #636D7C;
+  font-weight: bold;
+}
+
+.AbiltyTrait .TraitValue {
+  color: white;
+}
+
+.AbilityName {
+  color: white;
+  font-weight: bold;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

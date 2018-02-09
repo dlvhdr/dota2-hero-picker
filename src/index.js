@@ -3,7 +3,8 @@ import {
   createStore,
   combineReduces,
   applyMiddleware,
-  bindActionCreators
+  bindActionCreators,
+  compose
 } from 'redux';
 import App from './components/App';
 import { Provider } from 'react-redux';
@@ -14,15 +15,17 @@ import thunk from 'redux-thunk';
 import reducers from './reducers/reducers';
 
 const logger = store => next => action => {
-  // console.log('Dispatching', action)
+  console.log('Dispatching', action)
   let result = next(action)
-  // console.log('Next state', store.getState())
+  console.log('Next state', store.getState())
   return result
 }
 
+const composeEnhancers =
+  window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 const store = createStore(
   reducers,
-  applyMiddleware(thunk, logger)
+  composeEnhancers(applyMiddleware(thunk, logger))
 );
 
 ReactDOM.render(

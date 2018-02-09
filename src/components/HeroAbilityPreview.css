@@ -1,0 +1,8 @@
+.HeroAbilityPreviewRoot {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.SelectedHeroAbilityPreview {
+  box-shadow: 0 0 6px 2px skyblue;
+}

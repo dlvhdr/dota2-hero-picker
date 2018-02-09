@@ -2,3 +2,90 @@
   margin-left: 20px;
   position: relative;
 }
+
+.HeroPickerRoles {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-evenly;
+}
+
+.Role {
+  display: inline-block;
+  /* border-bottom: 2px #5a6f8a solid; */
+  color: #5a6f8a;
+  padding-bottom: 8px;
+  letter-spacing: 1px;
+  flex-grow: 1;
+  text-align: center;
+  position: relative;
+}
+
+.HeroPickerBottomRoles {
+  margin-top: 20px;
+  padding-right: 16px;
+}
+
+.HeroPickerBottomRoles .Role {
+  text-transform: uppercase;
+}
+
+.Role.ComplexityRole {
+  flex-grow: 5;
+}
+
+.RoleBorder {
+  position: absolute;
+  border-bottom: 2px solid #5a6f8a;
+  width: 60px;
+  left: 50%;
+  margin-left: -30px;
+  bottom: 0;
+  right: 0;
+  cursor: pointer;
+  height: 100%;
+}
+
+.Role:hover {
+  animation: whiten-text 0.5s forwards 1;
+}
+
+.Role:hover .RoleBorder  {
+  animation: whiten-border 0.5s forwards 1;
+}
+
+.HeroPickerBottomRoles .RoleBorder {
+  width: 88px;
+  margin-left: -44px;
+}
+
+.HeroPickerUpperRoles {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+@keyframes whiten-text {
+  0% {
+    color: #5a6f8a;
+  }
+  100% {
+    color: white;
+  }
+}
+
+@keyframes whiten-border {
+  0% {
+    border-bottom: 2px solid #5a6f8a;
+  }
+  100% {
+    border-bottom: 2px solid white;
+  }
+}
+
+.SelectedRole {
+  color: white;
+  text-shadow: 0px 0px 10px white;
+}
+
+.SelectedRole .RoleBorder {
+  border-bottom: 2px solid white;
+}
